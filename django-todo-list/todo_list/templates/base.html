@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task List</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+      /* Your original CSS remains untouched */
+      body {
+        font-family: 'Roboto', sans-serif;
+        background: #1e1e2f;
+        color: white;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+        padding-top: 60px; /* Fix overlap with navbar */
+      }
+
+      /* Navbar Styles */
+      nav {
+        width: 100%;
+        background-color: #333;
+        padding: 10px 20px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 10;
+      }
+
+      .nav-title {
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .logout-btn {
+        background-color: #ff6b6b;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9rem;
+      }
+
+      .logout-btn:hover {
+        background-color: #ff4b4b;
+      }
+
+      .logout-btn.top-right {
+        position: fixed;
+        top: 15px; /* Distance from the top */
+        right: 20px; /* Distance from the right */
+        z-index: 10; /* Ensure it's above other elements */
+      }
+
+      .container {
+        width: 100%;
+        max-width: 400px;
+        padding: 15px;
+        background-color: #2f2f44;
+        border-radius: 8px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        margin-top: 60px; /* To ensure the content doesn't overlap the navbar */
+      }
+
+      h1 {
+        text-align: center;
+        font-size: 1.5rem;
+        color: #fff;
+        margin-bottom: 15px;
+      }
+
+      .input-task-section {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 15px;
+      }
+
+      .input-task {
+        width: 100%;
+        padding: 8px;
+        border-radius: 5px;
+        border: none;
+        background-color: #3f3f5f;
+        color: #fff;
+        font-size: 0.9rem;
+      }
+
+      .btn-add {
+        padding: 8px 15px;
+        background-color: #ff62a1;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9rem;
+      }
+
+      .btn-add:hover {
+        background-color: #ff4c8b;
+      }
+
+      .task-list {
+        margin-top: 15px;
+        list-style: none;
+        padding: 0;
+      }
+
+      .task-item {
+        background-color: #353545;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        position: relative;
+        transition: background-color 0.3s;
+      }
+
+      .task-name {
+        flex: 1;
+        font-size: 0.9rem;
+      }
+
+      .task-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      .task-actions button {
+        padding: 4px 12px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.8rem;
+      }
+
+      .edit-btn {
+        background-color: #a4a4ff;
+        color: #fff;
+      }
+
+      .edit-btn:hover {
+        background-color: #8e8eff;
+      }
+
+      .save-btn {
+        background-color: #7bff8f;
+        color: #fff;
+      }
+
+      .save-btn:hover {
+        background-color: #62e67a;
+      }
+
+      .delete-btn {
+        background-color: #ff6b6b;
+        color: #fff;
+      }
+
+      .delete-btn:hover {
+        background-color: #ff4b4b;
+      }
+
+      .check-btn {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 2px solid #7bff8f;
+        background-color: transparent;
+        margin-right: 8px;
+        cursor: pointer;
+      }
+
+      .checked {
+        background-color: #7bff8f;
+      }
+
+      .checked-icon {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: white;
+        margin: auto;
+      }
+
+      .done .task-name {
+        text-decoration: line-through;
+        color: #7bff8f;
+      }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav>
+    <div class="nav-title">Task List</div>
+</nav>
+
+<!-- Logout Button in Top-Right Corner -->
+<button class="logout-btn top-right" onclick="logout()">Logout</button>
+
+<div class="container">
+    <h1>Task List</h1>
+    
+    <!-- Search bar section -->
+    <input 
+    type="text" id="searchBar" class="search-input-task" placeholder="Search Tasks">
+
+    <!-- Input and Add Task Section -->
+    <div class="input-task-section">
+        <input type="text" id="taskInput" class="input-task" placeholder="Add a task">
+        <button class="btn-add" id="addTaskBtn">Add</button>
+    </div>
+
+    <!-- Task List Section -->
+    <ul id="taskList" class="task-list"></ul>
+</div>
+
+<script>
+    const addTaskBtn = document.getElementById('addTaskBtn');
+    const taskInput = document.getElementById('taskInput');
+    const taskList = document.getElementById('taskList');
+    const searchBar = document.getElementById('searchBar');
+
+    addTaskBtn.addEventListener('click', () => {
+        if (taskInput.value.trim() === "") return;
+
+        const taskItem = document.createElement('li');
+        taskItem.classList.add('task-item');
+
+        taskItem.innerHTML = `
+            <div class="check-btn">
+                <div class="checked-icon"></div>
+            </div>
+            <span class="task-name">${taskInput.value}</span>
+            <div class="task-actions">
+                <button class="edit-btn">Edit</button>
+                <button class="save-btn">Save</button>
+                <button class="delete-btn">Delete</button>
+            </div>
+        `;
+
+        taskList.appendChild(taskItem);
+
+        // Reset input field
+        taskInput.value = "";
+
+        // Add event listener for DELETE button
+        const deleteBtn = taskItem.querySelector('.delete-btn');
+        deleteBtn.addEventListener('click', () => {
+            taskItem.remove();
+        });
+
+        // Add event listener for EDIT button
+        const editBtn = taskItem.querySelector('.edit-btn');
+        editBtn.addEventListener('click', () => {
+            const taskName = taskItem.querySelector('.task-name');
+            taskName.contentEditable = true;
+            taskName.focus();
+        });
+
+        // Add event listener for SAVE button
+        const saveBtn = taskItem.querySelector('.save-btn');
+        saveBtn.addEventListener('click', () => {
+            const taskName = taskItem.querySelector('.task-name');
+            taskName.contentEditable = false;
+        });
+
+        // Add event listener for CHECK button
+        const checkBtn = taskItem.querySelector('.check-btn');
+        checkBtn.addEventListener('click', () => {
+            checkBtn.classList.toggle('checked');
+            taskItem.classList.toggle('done');
+        });
+    });
+
+    // Search functionality
+    searchBar.addEventListener('input', () => {
+        const searchValue = searchBar.value.toLowerCase();
+        const tasks = document.querySelectorAll('.task-item');
+
+        tasks.forEach(task => {
+            const taskName = task.querySelector('.task-name').textContent.toLowerCase();
+            if (taskName.includes(searchValue)) {
+                task.style.display = '';
+            } else {
+                task.style.display = 'none';
+            }
+        });
+    });
+
+    // Logout function
+    function logout() {
+        // Redirect to login page
+        window.location.href = '/login'; // Assuming the login page is named 'login.html'
+    }
+</script>
+
+</body>
+</html>

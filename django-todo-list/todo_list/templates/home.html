@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}
+   Home
+{% endblock title %}
+
+{% block content %}
+<div class="container py-5">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                <strong>Success!</strong> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if all_items %}
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white text-center">
+                <h4 class="mb-0">Your Items</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col" class="text-center">Item</th>
+                                <th scope="col" class="text-center">Action</th>
+                                <th scope="col" class="text-center">Edit</th>
+                                <th scope="col" class="text-center">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for thing in all_items %}
+                                <tr class="{% if thing.completed %}table-secondary{% endif %}">
+                                    <td class="text-center {% if thing.completed %}text-decoration-line-through text-muted{% endif %}">
+                                        {{ thing.item }}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if thing.completed %}
+                                            <a class="btn btn-outline-primary btn-sm" href="{% url 'uncross' thing.id %}">Uncross</a>
+                                        {% else %}
+                                            <a class="btn btn-outline-success btn-sm" href="{% url 'cross_off' thing.id %}">Cross off</a>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <a class="btn btn-outline-warning btn-sm" href="{% url 'edit' thing.id %}">Edit</a>
+                                    </td>
+                                    <td class="text-center">
+                                        <a class="btn btn-outline-danger btn-sm" href="{% url 'delete' thing.id %}">Delete</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <h5 class="text-muted">No items found. Start adding something!</h5>
+        </div>
+    {% endif %}
+</div>
+{% endblock content %}
